@@ -1,42 +1,33 @@
-import io
 import click
-import os
-import json
-import sys
-import getpass
+import os, sys
 import requests
-import random
-import string
+import random, string
 from requests.models import HTTPBasicAuth
 import os.path
 
-migadu_email_address = None
-migadu_key = None
-mictl_dir = os.path.join(os.getenv("HOME"), ".mictl")
-keypath = os.path.join(os.getenv("HOME"), ".mictl", "key.ctl")
+# Mictl
+MICTL_DIR = os.path.join(os.getenv("HOME"), ".mictl")
+MICTL_KEY_FILE_PATH = os.path.join(os.getenv("HOME"), ".mictl", "key.ctl")
+RANDOM_PASSWORD_LENGTH = 10
+RANDOM_PASSWORD_SEED_TEXT = string.ascii_letters
+
+# Migadu
+MIGADU_API_BASE = 'https://api.migadu.com/v1/'
 
 def crit(text):
     click.echo('error: ' + click.style(text, 'black', 'red'))
     sys.exit(1)
 
 def get_auth():
-    if os.path.exists(keypath):
-        data = open(keypath).read()
+    if os.path.exists(MICTL_KEY_FILE_PATH):
+        data = open(MICTL_KEY_FILE_PATH).read()
         parts = data.split(':')
-        migadu_email_address = parts[0]
-        migadu_key = parts[1]
-        return HTTPBasicAuth(migadu_email_address, migadu_key)
+        return HTTPBasicAuth(parts[0], parts[1])
     else:
         crit('api client not configured. run \'mictl setup <email> <key>\'')
 
-VERBOSE=False
-
-migadu_api_base = 'https://api.migadu.com/v1/'
-
-RANDOM_PASSWORD_LENGTH = 10
 def generate_random_password():
-    letters = string.ascii_letters
-    return ''.join(random.choice(letters) for i in range(RANDOM_PASSWORD_LENGTH))
+    return ''.join(random.choice(RANDOM_PASSWORD_SEED_TEXT) for i in range(RANDOM_PASSWORD_LENGTH))
 
 @click.group(help = "A command-line interface for the Migadu email API.")
 def mictl():
@@ -47,11 +38,11 @@ def mictl():
 @click.argument('key')
 def setup(email, key):
     content = email + ':' + key
-    if not os.path.exists(mictl_dir):
-        os.makedirs(mictl_dir)
-    if os.path.exists(keypath):
-        os.unlink(keypath)
-    file = open(keypath, 'w')
+    if not os.path.exists(MICTL_DIR):
+        os.makedirs(MICTL_DIR)
+    if os.path.exists(MICTL_KEY_FILE_PATH):
+        os.unlink(MICTL_KEY_FILE_PATH)
+    file = open(MICTL_KEY_FILE_PATH, 'w')
     file.seek(0)
     file.write(content)
     click.echo('success: stored credentials')
@@ -61,15 +52,10 @@ def boxes():
     get_auth()
     pass
 
-@boxes.command(help = 'Creates a mailbox for a domain.')
-@click.argument('domain')
-def create(domain): 
-    click.echo('created')
-
 @boxes.command(help = 'Lists all mailboxes for a domain.')
 @click.argument('domain')
 def all(domain):
-    result = requests.get(migadu_api_base + f'domains/{domain}/mailboxes', auth = get_auth()).json()
+    result = requests.get(MIGADU_API_BASE + f'domains/{domain}/mailboxes', auth = get_auth()).json()
     try: 
         mailboxes = result['mailboxes']
     except KeyError:
@@ -114,7 +100,7 @@ def create(address, name, invite_address, password, random):
         data['password'] = password
 
     response = requests.post(
-        migadu_api_base + f'domains/{domain}/mailboxes',
+        MIGADU_API_BASE + f'domains/{domain}/mailboxes',
         json = data,
         auth = get_auth()
     )
@@ -139,7 +125,7 @@ def delete(address):
         crit('invalid address to delete')
         
     response = requests.delete(
-        migadu_api_base + f'domains/{domain}/mailboxes/{local}',
+        MIGADU_API_BASE + f'domains/{domain}/mailboxes/{local}',
         auth = get_auth()
     )
 
