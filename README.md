@@ -7,7 +7,7 @@ Command line tool for managing Migadu email hosting.
 #### Setup
 Add your [Migadu API key](https://admin.migadu.com/account/api/keys):
 ```sh
-mictl setup SDUMz11DCEyJJOIvmODI8bJ7HwfJkDFVJif9Ds9df38VDj83xG3sJOVIjfmSdofvndZjIJfoivnODIfn
+mictl setup my-admin-email@example.com SDUMz11DCEyJJOIvmODI8bJ7HwfJkDFVJif9Ds9df38VDj83xG3sJOVIjfmSdofvndZjIJfoivnODIfn
 ```
 
 ### Creation
