@@ -137,5 +137,12 @@ def delete(address):
 
 mictl.add_command(boxes)
 
+@mictl.command('usage')
+def usage():
+    click.echo(click.style('usage instructions for migadu domains', 'green'))
+    click.echo('incoming - IMAP imap.migadu.com - port 993 - TLS - username: full email')
+    click.echo('outgoing - SMTP smtp.migadu.com - port 465 - IMPLICIT TLS - username: full email')
+    click.echo('outgoing - SMTP smtp.migadu.com - port 587 - STARTTLS - username: full email')
+
 def _start_app():
     mictl()
