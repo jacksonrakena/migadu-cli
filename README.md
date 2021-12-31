@@ -33,5 +33,5 @@ mictl boxes delete test@example.com
 ```
 
 ## Copyright
-Mictl copyright &copy; 2019-2022 Jackson C. Rakena
+Mictl copyright &copy; 2019-2022 Jackson C. Rakena  
 All properties copyright of their respective authors.
